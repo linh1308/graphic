@@ -1,0 +1,86 @@
+* {
+    margin: 0;
+    padding: 0;
+    font-family: 'Courier New', Courier, monospace;
+}
+
+.navbar {
+    display: flex;
+    justify-content: space-around;
+    font-weight: bold;
+    font-size: 24px;
+    background-color: rgb(204, 203, 203);
+    align-items: center;
+    height: 50px;
+}
+
+.list-features {
+    list-style: none;
+    display: flex;
+}
+
+.feature-items {
+    padding-left: 70px;
+    position: relative;
+    cursor: pointer;
+    display: flex;
+}
+
+.feature-items:hover {
+    color: blue;
+}
+
+.feature-items:hover .list-item {
+    display: block;
+}
+
+.feature-items::after {
+    content: "\2207";
+    padding-left: 10px;
+    /* position: absolute; */
+    /* top: 0;
+    right: -20px; */
+}
+
+.list-item {
+    display: none;
+    position: absolute;
+    width: calc(100% - 50px);
+    top: 40px;
+}
+
+.list-item::after {
+    content: '';
+    position: absolute;
+    width: 100%;
+    top: -12px;
+    height: 20px;
+}
+
+.list-item:nth-child(3)::after{
+    content: '';
+    position: absolute;
+    width: 120%;
+    top: -12px;
+    height: 20px;
+}
+
+.list-item ul {
+    list-style: none;
+    background-color: rgb(204, 203, 203);
+    border-radius: 5%;
+    overflow: hidden;
+}
+
+.list-item li {
+    padding-bottom: 15px;
+    font-size: 20px;
+    padding-left: 10px;
+    color: black;
+    padding-top: 15px;
+}
+
+.list-item li:hover {
+    background-color: blue;
+    color: white;
+}

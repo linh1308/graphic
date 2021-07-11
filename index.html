@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style type="text/css">
+        html,
+        body {
+            margin: 0;
+            padding: 0;
+            /* overflow: hidden; */
+        }
+    </style>
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+    <div class="nav">
+        <nav class="navbar">
+            <div class="name">ĐỒ ÁN CUỐI KÌ ĐỒ HOẠ MÁY TÍNH</div>
+            <ul class="list-features">
+                <li class="feature-items">
+                    <div class="name-item">Geometry</div>
+                    <div class="list-item">
+                        <ul>
+                            <li onclick="addGeo('box')">
+                                Box
+                            </li>
+                            <li onclick="addGeo('sphere')">
+                                Sphere
+                            </li>
+                            <li onclick="addGeo('cone')">
+                                Cone
+                            </li>
+                            <li onclick="addGeo('cylinder')">
+                                Cylinder
+                            </li>
+                            <li onclick="addGeo('torus')">
+                                Torus
+                            </li>
+                            <li onclick="">
+                                Teapot
+                            </li>
+                        </ul>
+                    </div>
+                </li>
+                <li class="feature-items">
+                    <div class="name-item">Surface</div>
+                    <div class="list-item">
+                        <ul>
+                            <li onclick="">
+                                Point
+                            </li>
+                            <li>
+                                Line
+                            </li>
+                            <li>
+                                Solid
+                            </li>
+                            <li>
+                                Select Texture
+                            </li>
+                        </ul>
+                    </div>
+                </li>
+                <li class="feature-items">
+                    <div class="name-item">Light</div>
+                    <div class="list-item">
+                        <ul>
+                            <li>
+                                Point Light
+                            </li>
+                            <li>
+                                Remove Light
+                            </li>
+                        </ul>
+                    </div>
+                </li>
+                <li class="feature-items">
+                    <div class="name-item">Animation</div>
+                    <div class="list-item">
+                        <ul>
+                            <li>
+                                Animation 1
+                            </li>
+                            <li>
+                                Animation 2
+                            </li>
+                            <li>
+                                Animation 3
+                            </li>
+                        </ul>
+                    </div>
+                </li>
+            </ul>
+    </div>
+    </nav>
+    <div id="app"></div>
+
+    <script type="text/javascript" src="./three.js"></script>
+    <script type="text/javascript">
+        const scene = new THREE.Scene();
+        const renderer = new THREE.WebGLRenderer();
+
+        let plane = getPlane(300);
+        plane.name = 'plane-1';
+        plane.rotation.x = Math.PI / 2;
+        plane.position.y = -20;
+        scene.add(plane);
+        onRender();
+
+        let mesh;
+
+        const catalog = {
+            box: new THREE.BoxGeometry(5, 5, 5),
+            sphere: new THREE.SphereGeometry(5, 32, 32),
+            cone: new THREE.ConeGeometry(5, 20, 32),
+            cylinder: new THREE.CylinderGeometry(5, 5, 20, 32),
+            torus: new THREE.TorusGeometry(10, 3, 16, 100),
+        }
+
+        let material = {
+            default: new THREE.MeshBasicMaterial({ color: 0xffff00 }),
+            line: new THREE.LineBasicMaterial({
+                color: 0xffffff,
+                linewidth: 1,
+                linecap: 'round', 
+                linejoin: 'round'
+            }),
+
+        }
+
+        function addGeo(item, materialOpt = 'default') {
+            if (mesh !== undefined) {
+                scene.remove(mesh);
+                mesh.geometry.dispose();
+            }
+
+            function onChange() {
+                
+            }
+
+            let geometry = catalog[item];
+            let selectMaterial = material[materialOpt];
+
+            mesh = new THREE.Mesh(geometry, selectMaterial);
+            scene.add(mesh);
+            onRender();
+        }
+
+        function onRender() {
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            let camera = new THREE.PerspectiveCamera(
+                75,
+                window.innerWidth / window.innerHeight,
+                0.1,
+                1000
+            );
+
+            camera.position.x = 1;
+            camera.position.y = 5;
+            camera.position.z = 20;
+
+            camera.lookAt(new THREE.Vector3(0, 0, 0));
+
+            renderer.render(scene, camera);
+            document.getElementById('app').appendChild(renderer.domElement);
+        }
+
+        function getPlane(size) {
+            let geometry = new THREE.PlaneGeometry(size, size);
+            let material = new THREE.MeshBasicMaterial({
+                color: 0xffffff,
+                side: THREE.DoubleSide
+            });
+            let mesh = new THREE.Mesh(
+                geometry,
+                material
+            );
+
+            return mesh;
+        }
+
+    </script>
+</body>
+
+</html>
