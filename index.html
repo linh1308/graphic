@@ -51,17 +51,18 @@
                     <div class="name-item">Surface</div>
                     <div class="list-item">
                         <ul>
-                            <li onclick="">
+                            <li onclick="drawPoint()">
                                 Point
                             </li>
-                            <li>
+                            <li onclick="changeMaterial('line')">
                                 Line
                             </li>
                             <li>
                                 Solid
                             </li>
                             <li>
-                                Select Texture
+                                <input type="file" id="file" accept=".jpg, .png, .jpeg">
+                                <button id="buttonFile">Upload file</button>
                             </li>
                         </ul>
                     </div>
@@ -112,10 +113,10 @@
         scene.add(plane);
         onRender();
 
-        let mesh;
+        let mesh, point;
 
         const catalog = {
-            box: new THREE.BoxGeometry(5, 5, 5),
+            box: new THREE.BoxGeometry(10, 10, 10),
             sphere: new THREE.SphereGeometry(5, 32, 32),
             cone: new THREE.ConeGeometry(5, 20, 32),
             cylinder: new THREE.CylinderGeometry(5, 5, 20, 32),
@@ -123,14 +124,17 @@
         }
 
         let material = {
-            default: new THREE.MeshBasicMaterial({ color: 0xffff00 }),
-            line: new THREE.LineBasicMaterial({
-                color: 0xffffff,
-                linewidth: 1,
-                linecap: 'round', 
-                linejoin: 'round'
+            default: new THREE.MeshBasicMaterial({ color: 0xf3ffe2 }),
+            line: new THREE.MeshNormalMaterial({
+                color: 0xff0000,
+                transparent: true,
+                opacity: 1,
+                wireframe: true,
+                wireframeLinewidth: 5,
+                wireframeLinejoin: 'round',
+                wireframeLinecap: 'round',
             }),
-
+            point: new THREE.PointsMaterial({ size: 0.05, transparent: true }),
         }
 
         function addGeo(item, materialOpt = 'default') {
@@ -138,9 +142,9 @@
                 scene.remove(mesh);
                 mesh.geometry.dispose();
             }
-
-            function onChange() {
-                
+            if (point !== undefined) {
+                scene.remove(point);
+                point.geometry.dispose();
             }
 
             let geometry = catalog[item];
@@ -148,6 +152,32 @@
 
             mesh = new THREE.Mesh(geometry, selectMaterial);
             scene.add(mesh);
+            // console.log(scene)
+            onRender();
+        }
+
+        function changeMaterial(item) {
+            // console.log(geometry)
+            scene.children[1].material = material[item];
+            onRender();
+        }
+
+        function drawPoint() {
+            let geometry = scene.children[1].geometry;
+            if (point !== undefined) {
+                scene.remove(point);
+                point.geometry.dispose();
+            }
+            if (mesh !== undefined) {
+                scene.remove(mesh);
+                mesh.geometry.dispose();
+            }
+            // geometry = scene.children[1].geometry;
+            let selectMaterial = material['point'];
+
+            point = new THREE.Points(geometry, selectMaterial);
+            scene.add(point);
+            console.log(scene)
             onRender();
         }
 
@@ -165,7 +195,7 @@
             camera.position.z = 20;
 
             camera.lookAt(new THREE.Vector3(0, 0, 0));
-
+            // renderer.setClearColor(0xffffff)
             renderer.render(scene, camera);
             document.getElementById('app').appendChild(renderer.domElement);
         }
@@ -173,7 +203,7 @@
         function getPlane(size) {
             let geometry = new THREE.PlaneGeometry(size, size);
             let material = new THREE.MeshBasicMaterial({
-                color: 0xffffff,
+                color: 0x888888,
                 side: THREE.DoubleSide
             });
             let mesh = new THREE.Mesh(
@@ -183,6 +213,19 @@
 
             return mesh;
         }
+
+        window.onload = function () {
+            var buttonFile = document.getElementById("buttonFile");
+            var file = document.getElementById("file");
+
+            buttonFile.onclick = function () {
+                document.getElementById("file").click();
+            };
+
+            file.onchange = function () {
+                console.log(file.files[0].webkitRelativePath);
+            };
+        };
 
     </script>
 </body>

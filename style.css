@@ -84,3 +84,7 @@
     background-color: blue;
     color: white;
 }
+
+#file {
+    display: none;
+}
