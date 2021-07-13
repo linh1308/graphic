@@ -104,15 +104,24 @@
     <script type="text/javascript" src="./three.js"></script>
     <script type="text/javascript">
         
-        // let teageo = require("./TeapotGeometry");
+        
         const scene = new THREE.Scene();
         const renderer = new THREE.WebGLRenderer();
         
+        let pl = false;
         
         let plane = getPlane(300);
         plane.name = 'plane-1';
         plane.rotation.x = Math.PI / 2;
         plane.position.y = -20;
+        
+        if (pl == true) {
+            let pointLight = addPointLight();
+            pointLight.position.y = 2;
+            scene.add(pointLight);
+        }
+
+
         scene.add(plane);
         onRender();
 
@@ -220,9 +229,9 @@
         
         function addPointLight() {
             const light = new THREE.PointLight( 0xffffff, 1.5 );
-            light.position.set( 0, 100, 90 );
-            light.position.y = 1.5,
-            scene.add( light );
+            // light.position.set( 0, 100, 90 );
+            pl = true;
+            return light;
         }
 
         window.onload = function () {
