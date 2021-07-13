@@ -26,22 +26,22 @@
                     <div class="name-item">Geometry</div>
                     <div class="list-item">
                         <ul>
-                            <li onclick="addGeo('box')">
+                            <li class="box">
                                 Box
                             </li>
-                            <li onclick="addGeo('sphere')">
+                            <li class="sphere">
                                 Sphere
                             </li>
-                            <li onclick="addGeo('cone')">
+                            <li class="cone">
                                 Cone
                             </li>
-                            <li onclick="addGeo('cylinder')">
+                            <li class="cylinder">
                                 Cylinder
                             </li>
-                            <li onclick="addGeo('torus')">
+                            <li class="torus">
                                 Torus
                             </li>
-                            <li onclick="">
+                            <li>
                                 Teapot
                             </li>
                         </ul>
@@ -51,18 +51,19 @@
                     <div class="name-item">Surface</div>
                     <div class="list-item">
                         <ul>
-                            <li onclick="drawPoint()">
+                            <li class="point">
                                 Point
                             </li>
-                            <li onclick="changeMaterial('line')">
+                            <li class="line">
                                 Line
                             </li>
                             <li>
                                 Solid
                             </li>
-                            <li>
-                                <input type="file" id="file" accept=".jpg, .png, .jpeg">
-                                <button id="buttonFile">Upload file</button>
+                            <li class="texture">
+                                <!-- <input type="file" id="filetag">
+                                <img src="" id="preview"> -->
+                                texture
                             </li>
                         </ul>
                     </div>
@@ -71,10 +72,10 @@
                     <div class="name-item">Light</div>
                     <div class="list-item">
                         <ul>
-                            <li>
+                            <li class="point-light">
                                 Point Light
                             </li>
-                            <li>
+                            <li class="light-del">
                                 Remove Light
                             </li>
                         </ul>
@@ -84,150 +85,28 @@
                     <div class="name-item">Animation</div>
                     <div class="list-item">
                         <ul>
-                            <li>
+                            <li class="animation-1">
                                 Animation 1
                             </li>
-                            <li>
+                            <li class="animation-2">
                                 Animation 2
-                            </li>
-                            <li>
-                                Animation 3
                             </li>
                         </ul>
                     </div>
                 </li>
             </ul>
+        </nav>
     </div>
-    </nav>
-    <div id="app"></div>
-
-    <script type="text/javascript" src="./three.js"></script>
-    <script type="text/javascript">
-        const scene = new THREE.Scene();
-        const renderer = new THREE.WebGLRenderer();
-
-        let plane = getPlane(300);
-        plane.name = 'plane-1';
-        plane.rotation.x = Math.PI / 2;
-        plane.position.y = -20;
-        scene.add(plane);
-        onRender();
-
-        let mesh, point;
-
-        const catalog = {
-            box: new THREE.BoxGeometry(10, 10, 10),
-            sphere: new THREE.SphereGeometry(5, 32, 32),
-            cone: new THREE.ConeGeometry(5, 20, 32),
-            cylinder: new THREE.CylinderGeometry(5, 5, 20, 32),
-            torus: new THREE.TorusGeometry(10, 3, 16, 100),
-        }
-
-        let material = {
-            default: new THREE.MeshBasicMaterial({ color: 0xf3ffe2 }),
-            line: new THREE.MeshNormalMaterial({
-                color: 0xff0000,
-                transparent: true,
-                opacity: 1,
-                wireframe: true,
-                wireframeLinewidth: 5,
-                wireframeLinejoin: 'round',
-                wireframeLinecap: 'round',
-            }),
-            point: new THREE.PointsMaterial({ size: 0.05, transparent: true }),
-        }
-
-        function addGeo(item, materialOpt = 'default') {
-            if (mesh !== undefined) {
-                scene.remove(mesh);
-                mesh.geometry.dispose();
-            }
-            if (point !== undefined) {
-                scene.remove(point);
-                point.geometry.dispose();
-            }
-
-            let geometry = catalog[item];
-            let selectMaterial = material[materialOpt];
-
-            mesh = new THREE.Mesh(geometry, selectMaterial);
-            scene.add(mesh);
-            // console.log(scene)
-            onRender();
-        }
-
-        function changeMaterial(item) {
-            // console.log(geometry)
-            scene.children[1].material = material[item];
-            onRender();
-        }
-
-        function drawPoint() {
-            let geometry = scene.children[1].geometry;
-            if (point !== undefined) {
-                scene.remove(point);
-                point.geometry.dispose();
-            }
-            if (mesh !== undefined) {
-                scene.remove(mesh);
-                mesh.geometry.dispose();
-            }
-            // geometry = scene.children[1].geometry;
-            let selectMaterial = material['point'];
-
-            point = new THREE.Points(geometry, selectMaterial);
-            scene.add(point);
-            console.log(scene)
-            onRender();
-        }
-
-        function onRender() {
-            renderer.setSize(window.innerWidth, window.innerHeight);
-            let camera = new THREE.PerspectiveCamera(
-                75,
-                window.innerWidth / window.innerHeight,
-                0.1,
-                1000
-            );
-
-            camera.position.x = 1;
-            camera.position.y = 5;
-            camera.position.z = 20;
-
-            camera.lookAt(new THREE.Vector3(0, 0, 0));
-            // renderer.setClearColor(0xffffff)
-            renderer.render(scene, camera);
-            document.getElementById('app').appendChild(renderer.domElement);
-        }
-
-        function getPlane(size) {
-            let geometry = new THREE.PlaneGeometry(size, size);
-            let material = new THREE.MeshBasicMaterial({
-                color: 0x888888,
-                side: THREE.DoubleSide
-            });
-            let mesh = new THREE.Mesh(
-                geometry,
-                material
-            );
-
-            return mesh;
-        }
-
-        window.onload = function () {
-            var buttonFile = document.getElementById("buttonFile");
-            var file = document.getElementById("file");
-
-            buttonFile.onclick = function () {
-                document.getElementById("file").click();
-            };
-
-            file.onchange = function () {
-                console.log(file.files[0].webkitRelativePath);
-            };
-        };
-
-    </script>
+    <div id="app">
+        <ul class="list-btn">
+            <button class="item-btn"><img src="./svg/arrows-alt-solid.svg" alt="svg" width="25px"></button>
+            <button class="item-btn"><img src="./svg/sync-alt-solid.svg" alt="svg" width="25px"></button>
+            <button class="item-btn"><img src="./svg/balance-scale-solid.svg" alt="svg" width="31px"></button>
+        </ul>
+    </div>
+    <script src="https://code.createjs.com/1.0.0/tweenjs.min.js"></script>
+    <script type="module" src="./app.js"></script>
+    
 </body>
 
 </html>
