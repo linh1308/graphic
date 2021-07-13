@@ -88,3 +88,7 @@
 #file {
     display: none;
 }
+
+.list-btn {
+    position: absolute;
+}
