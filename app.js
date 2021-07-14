@@ -17,6 +17,7 @@ const catalog = {
     octa: new THREE.OctahedronGeometry(10, 1),
     knot: new THREE.TorusKnotGeometry(10, 2, 50, 8),
     dode: new THREE.DodecahedronBufferGeometry(10, 0),
+    icosa: new THREE.IcosahedronGeometry(10, 0),
 }
 
 let material = {
@@ -260,6 +261,7 @@ let tetra = document.querySelector('.tetra');
 let octa = document.querySelector('.octa');
 let knot = document.querySelector('.knot');
 let dode = document.querySelector('.dode');
+let icosa = document.querySelector('.icosa');
 let drawWithPoint = document.querySelector('.point');
 let drawWithLine = document.querySelector('.line');
 let drawWithTexture = document.querySelector('.texture');
@@ -300,6 +302,9 @@ function addFunc() {
     }
     dode.onclick = function() {
         addGeo('dode');
+    }
+    icosa.onclick = function() {
+        addGeo('icosa');
     }
     // Surface
     drawWithPoint.onclick = function () {
