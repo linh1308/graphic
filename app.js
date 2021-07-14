@@ -1,5 +1,6 @@
 import * as THREE from 'three';
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
+import { TeapotGeometry } from "./node_modules/three/examples/jsm/geometries/TeapotGeometry"
 import { Camera, Clock, DirectionalLight, MeshBasicMaterial, Plane } from 'three';
 
 let mesh, point, camera, light, ani1, ani2, plane, ambientLight, controls;
@@ -18,6 +19,7 @@ const catalog = {
     knot: new THREE.TorusKnotGeometry(10, 2, 50, 8),
     dode: new THREE.DodecahedronBufferGeometry(10, 0),
     icosa: new THREE.IcosahedronGeometry(10, 0),
+    teapot: createTeapot(),
 }
 
 let material = {
@@ -131,7 +133,14 @@ function lightRemove() {
     update(renderer, scene, camera, controls);
 }
 
+function createTeapot() {
+    let geometry = new TeapotGeometry(
+        10, 10,
+        true, true, true, false, false
+    );
 
+    return geometry;
+}
 
 function onRender() {
     plane = getPlane(300, new THREE.MeshBasicMaterial({
@@ -256,7 +265,7 @@ let sphere = document.querySelector('.sphere');
 let cone = document.querySelector('.cone');
 let cylinder = document.querySelector('.cylinder');
 let torus = document.querySelector('.torus');
-let teapot = document.querySelector('.tp');
+let teapot = document.querySelector('.teapot');
 let tetra = document.querySelector('.tetra');
 let octa = document.querySelector('.octa');
 let knot = document.querySelector('.knot');
@@ -288,9 +297,9 @@ function addFunc() {
     torus.onclick = function () {
         addGeo('torus');
     };
-    // teapot.onclick = function() {
-        
-    // }
+    teapot.onclick = function() {
+        addGeo('teapot');
+    }
     tetra.onclick = function() {
         addGeo('tetra');
     }
