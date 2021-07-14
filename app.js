@@ -18,7 +18,7 @@ const catalog = {
 let material = {
     default: new THREE.MeshBasicMaterial({ color: 0xdddddd }),
     standard: new THREE.MeshStandardMaterial({ color: 0xdddddd }),
-    point: new THREE.PointsMaterial({ size: 0.05, color: 0xdddddd }),
+    point: new THREE.PointsMaterial({ size: 0.2, color: 0xdddddd }),
 }
 
 function addGeo(item, materialOpt = 'default') {
@@ -81,7 +81,7 @@ function texture() {
     mesh.material = new THREE.MeshStandardMaterial({ color: 0xdddddd })
     let selectMaterial = mesh.material;
     selectMaterial.map = loader.load('./img/2021.png');
-    
+
     update(renderer, scene, camera, controls);
 }
 
