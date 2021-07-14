@@ -1,5 +1,7 @@
 import * as THREE from 'three';
-import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
+// import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
+// import { TeapotGeometry } from "./TeapotGeometry"
+// import { OBJLoader } from "./OBJLoader"
 
 let mesh, point, camera, light;
 
@@ -20,11 +22,20 @@ const catalog = {
     cone: new THREE.ConeGeometry(5, 20, 32),
     cylinder: new THREE.CylinderGeometry(5, 5, 20, 32),
     torus: new THREE.TorusGeometry(10, 3, 16, 100),
+    tetra: new THREE.TetrahedronGeometry(8,3),
+    octa: new THREE.OctahedronGeometry(10, 1),
+    knot: new THREE.TorusKnotGeometry(10, 2, 50, 8),
+    dode: new THREE.DodecahedronBufferGeometry(10, 0),
 }
 
 let material = {
     default: new THREE.MeshLambertMaterial({ color: 0xdddddd }),
     point: new THREE.PointsMaterial({ size: 0.05, color: 0xdddddd }),
+    phong : new THREE.MeshPhongMaterial( { 
+        color: 0xaaaaaa, 
+        side: THREE.DoubleSide,
+        shininess: 15,
+    } ),
 }
 
 function addGeo(item, materialOpt = 'default') {
@@ -42,7 +53,7 @@ function addGeo(item, materialOpt = 'default') {
 
     mesh = new THREE.Mesh(geometry, selectMaterial);
     scene.add(mesh);
-    console.log(scene)
+    // console.log(scene)
     onRender();
 }
 
@@ -85,6 +96,7 @@ function drawLine() {
     onRender();
 }
 
+
 // function texture() {
 //     let imgTextture = new THREE.TextureLoader();
 //     let mapTexture = imgTextture.load('./background.jpg');
@@ -126,8 +138,9 @@ function drawLine() {
 // }
 
 function lightShow() {
-    light = new THREE.PointLight(0xff0000, 1, 100);
+    light = new THREE.PointLight(0xffffff, 1, 100);
     light.position.set(1, 20, 20);
+    // light.position.y = 0;
     light.name = 'light';
     scene.add(light);
     onRender();
@@ -142,8 +155,10 @@ function lightRemove() {
     onRender();
 }
 
+
+
 function onRender() {
-    renderer.setSize(window.innerWidth, window.innerHeight);
+    
     camera = new THREE.PerspectiveCamera(
         75,
         window.innerWidth / window.innerHeight,
@@ -157,8 +172,10 @@ function onRender() {
 
     camera.lookAt(new THREE.Vector3(0, 0, 0));
     // renderer.setClearColor(0xffffff)
-    renderer.render(scene, camera);
+    renderer.setSize(window.innerWidth, window.innerHeight);
     document.getElementById('app').appendChild(renderer.domElement);
+    renderer.render(scene, camera);
+    
 }
 
 function getPlane(size) {
@@ -232,6 +249,11 @@ let sphere = document.querySelector('.sphere');
 let cone = document.querySelector('.cone');
 let cylinder = document.querySelector('.cylinder');
 let torus = document.querySelector('.torus');
+let teapot = document.querySelector('.tp');
+let tetra = document.querySelector('.tetra');
+let octa = document.querySelector('.octa');
+let knot = document.querySelector('.knot');
+let dode = document.querySelector('.dode');
 let drawWithPoint = document.querySelector('.point');
 let drawWithLine = document.querySelector('.line');
 let drawWithTexture = document.querySelector('.texture');
@@ -257,7 +279,21 @@ function addFunc() {
     torus.onclick = function () {
         addGeo('torus');
     };
-
+    teapot.onclick = function() {
+        
+    }
+    tetra.onclick = function() {
+        addGeo('tetra');
+    }
+    octa.onclick = function() {
+        addGeo('octa');
+    }
+    knot.onclick = function() {
+        addGeo('knot');
+    }
+    dode.onclick = function() {
+        addGeo('dode');
+    }
     // Surface
     drawWithPoint.onclick = function () {
         drawPoint();
