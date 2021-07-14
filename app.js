@@ -23,11 +23,6 @@ let material = {
     default: new THREE.MeshBasicMaterial({ color: 0xdddddd }),
     standard: new THREE.MeshStandardMaterial({ color: 0xdddddd }),
     point: new THREE.PointsMaterial({ size: 0.05, color: 0xdddddd }),
-    phong : new THREE.MeshPhongMaterial( { 
-        color: 0xaaaaaa, 
-        side: THREE.DoubleSide,
-        shininess: 15,
-    } ),
 }
 
 function addGeo(item, materialOpt = 'default') {
@@ -291,9 +286,9 @@ function addFunc() {
     torus.onclick = function () {
         addGeo('torus');
     };
-    teapot.onclick = function() {
+    // teapot.onclick = function() {
         
-    }
+    // }
     tetra.onclick = function() {
         addGeo('tetra');
     }
