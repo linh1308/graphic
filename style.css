@@ -68,8 +68,9 @@
 .list-item ul {
     list-style: none;
     background-color: rgb(204, 203, 203);
-    border-radius: 5%;
-    overflow: hidden;
+    border-radius: 10px;
+    max-height: 200px;
+    overflow-x: hidden;
 }
 
 .list-item li {
@@ -91,4 +92,10 @@
 
 .list-btn {
     position: absolute;
+}
+
+#gui { 
+    position: absolute; 
+    top: 50px; 
+    right: 0px 
 }
