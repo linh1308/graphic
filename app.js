@@ -4,7 +4,7 @@ import { TeapotGeometry } from "./node_modules/three/examples/jsm/geometries/Tea
 import { ParametricGeometries } from "./node_modules/three/examples/jsm/geometries/ParametricGeometries";
 import * as dat from 'dat.gui';
 
-let mesh, point, camera, light, ani1, plane, controls, selectMaterial;
+let mesh, point, camera, light, ani1, plane, controls, selectMaterial, solid;
 
 const scene = new THREE.Scene();
 let renderer = new THREE.WebGLRenderer({ antialias: true });
@@ -54,9 +54,9 @@ function addGeo(item, materialOpt = 'default') {
         scene.remove(mesh);
         mesh.geometry.dispose();
     }
-    if (point !== undefined) {
-        scene.remove(point);
-        point.geometry.dispose();
+    if (solid !== undefined) {
+        scene.remove(solid);
+        solid.geometry.dispose();
     }
     if (light !== undefined) {
         selectMaterial = material['standard'];
@@ -66,7 +66,6 @@ function addGeo(item, materialOpt = 'default') {
     let geometry = catalog[item];
     mesh = new THREE.Mesh(geometry, selectMaterial);
     mesh.castShadow = true;
-    mesh.name = 'objectGeo';
     scene.add(mesh);
     update(renderer, scene, camera, controls);
 }
@@ -90,6 +89,10 @@ function drawPoint() {
         scene.remove(mesh);
         mesh.geometry.dispose();
     }
+    if (solid !== undefined) {
+        scene.remove(solid);
+        solid.geometry.dispose();
+    }
     let selectMaterial = material['point'];
 
     point = new THREE.Points(geometry, selectMaterial);
@@ -109,9 +112,29 @@ function drawLine() {
         scene.remove(mesh);
         mesh.geometry.dispose();
     }
+    if (solid !== undefined) {
+        scene.remove(solid);
+        solid.geometry.dispose();
+    }
     point = new THREE.Line(geometry, selectMaterial);
     point.castShadow = true;
     scene.add(point);
+    update(renderer, scene, camera, controls);
+}
+
+function drawSolid() {
+    let geometry = scene.children[1].geometry === undefined ? scene.children[scene.children.length - 1].geometry : scene.children[1].geometry;
+    let selectMaterial = scene.children[1].material === undefined ? scene.children[scene.children.length - 1].material : scene.children[1].material;
+    if (point !== undefined) {
+        scene.remove(point);
+        point.geometry.dispose();
+    }
+    if (mesh !== undefined) {
+        scene.remove(mesh);
+        mesh.geometry.dispose();
+    }
+    solid = new THREE.Mesh(geometry, selectMaterial);
+    scene.add(solid);
     update(renderer, scene, camera, controls);
 }
 
@@ -121,7 +144,6 @@ function texture() {
     mesh.material = new THREE.MeshStandardMaterial({ color: 0xdddddd })
     let selectMaterial = mesh.material;
     selectMaterial.map = loader.load('./img/2021.png');
-
     update(renderer, scene, camera, controls);
 }
 
@@ -341,38 +363,89 @@ function setLight() {
 function setControlObj() {
     let affineTransform = gui.addFolder('Affine transform');
     affineTransform.add(controlObject, 'posX', -20, 20).name('position x').onChange(function () {
-        mesh.position.set(0, 0, 0)
-        mesh.position.x += controlObject.posX;
-
+        if (mesh) {
+            mesh.position.set(0, 0, 0)
+            mesh.position.x += controlObject.posX;
+        }
+        if (point) {
+            point.position.set(0, 0, 0)
+            point.position.x += controlObject.posX;
+        }
     });
     affineTransform.add(controlObject, 'posY', -20, 20).name('position y').onChange(function () {
-        mesh.position.set(0, 0, 0)
-        mesh.position.y += controlObject.posY;
+        if (mesh) {
+            mesh.position.set(0, 0, 0)
+            mesh.position.y += controlObject.posY;
+        }
+        if (point) {
+            point.position.set(0, 0, 0)
+            point.position.y += controlObject.posY;
+        }
     });
     affineTransform.add(controlObject, 'posZ', -20, 20).name('position z').onChange(function () {
-        mesh.position.set(0, 0, 0)
-        mesh.position.z += controlObject.posZ;
+        if (mesh) {
+            mesh.position.set(0, 0, 0)
+            mesh.position.z += controlObject.posZ;
+        }
+        if (point) {
+            point.position.set(0, 0, 0)
+            point.position.z += controlObject.posZ;
+        }
     });
     affineTransform.add(controlObject, 'rotX', 0, 20).name('rotate x').onChange(function () {
-        mesh.position.set(0, 0, 0)
-        mesh.rotation.x += controlObject.rotX;
+        if (mesh) {
+            mesh.rotation.set(0, 0, 0);
+            mesh.rotation.x += controlObject.rotX;
+        }
+        if (point) {
+            point.rotation.set(0, 0, 0);
+            point.rotation.x += controlObject.rotX;
+        }
     });
     affineTransform.add(controlObject, 'rotY', 0, 20).name('rotate y').onChange(function () {
-        mesh.rotation.y += controlObject.rotY;
+        if (mesh) {
+            mesh.rotation.set(0, 0, 0);
+            mesh.rotation.y += controlObject.rotY;
+        }
+        if (point) {
+            point.rotation.set(0, 0, 0);
+            point.rotation.y += controlObject.rotY;
+        }
     });
     affineTransform.add(controlObject, 'rotZ', 0, 20).name('rotate z').onChange(function () {
-        mesh.rotation.z += controlObject.rotZ;
+        if (mesh) {
+            mesh.rotation.set(0, 0, 0);
+            mesh.rotation.z += controlObject.rotZ;
+        }
+        if (point) {
+            point.rotation.set(0, 0, 0);
+            point.rotation.z += controlObject.rotZ;
+        }
     });
     affineTransform.add(controlObject, 'scaX', 0, 20).name('scale x').onChange(function () {
-        mesh.scale.x = controlObject.scaX;
+        if (mesh) {
+            mesh.scale.x = controlObject.scaX;
+        }
+        if (point) {
+            point.scale.x = controlObject.scaX;
+        }
     });
     affineTransform.add(controlObject, 'scaY', 0, 20).name('scale y').onChange(function () {
-        mesh.scale.y = controlObject.scaY;
+        if (mesh) {
+            mesh.scale.y = controlObject.scaY;
+        }
+        if (point) {
+            point.scale.y = controlObject.scaY;
+        }
     });
     affineTransform.add(controlObject, 'scaZ', 0, 20).name('scale z').onChange(function () {
-        mesh.scale.z = controlObject.scaY;
+        if (mesh) {
+            mesh.scale.z = controlObject.scaZ;
+        }
+        if (point) {
+            point.scale.z = controlObject.scaZ;
+        }
     });
-
 }
 
 setColor();
@@ -407,6 +480,7 @@ let tube = document.querySelector('.tube');
 let para = document.querySelector('.parametric');
 let drawWithPoint = document.querySelector('.point');
 let drawWithLine = document.querySelector('.line');
+let drawWithSolid = document.querySelector('.solid');
 let drawWithTexture = document.querySelector('.texture');
 let playAnimation_1 = document.querySelector('.animation-1');
 let playAnimation_2 = document.querySelector('.animation-2');
@@ -462,6 +536,9 @@ function addFunc() {
     };
     drawWithLine.onclick = function () {
         drawLine();
+    };
+    drawWithSolid.onclick = function () {
+        drawSolid();
     };
     drawWithTexture.onclick = function () {
         texture();
