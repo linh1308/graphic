@@ -1,12 +1,37 @@
 import * as THREE from 'three';
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
 import { TeapotGeometry } from "./node_modules/three/examples/jsm/geometries/TeapotGeometry"
+import { ParametricGeometries } from "./node_modules/three/examples/jsm/geometries/ParametricGeometries"
 import { Camera, Clock, DirectionalLight, MeshBasicMaterial, Plane } from 'three';
 
 let mesh, point, camera, light, ani1, ani2, plane, ambientLight, controls;
 
 const scene = new THREE.Scene();
 let renderer = new THREE.WebGLRenderer({ antialias: true });
+
+// class define tube
+class CustomSinCurve extends THREE.Curve {
+
+	constructor( scale = 1 ) {
+
+		super();
+
+		this.scale = scale;
+
+	}
+
+	getPoint( t, optionalTarget = new THREE.Vector3() ) {
+
+		const tx = t * 3 - 1.5;
+		const ty = Math.sin( 2 * Math.PI * t );
+		const tz = 0;
+
+		return optionalTarget.set( tx, ty, tz ).multiplyScalar( this.scale );
+
+	}
+
+}
+const path = new CustomSinCurve( 10 );
 
 const catalog = {
     box: new THREE.BoxGeometry(10, 10, 10),
@@ -20,6 +45,8 @@ const catalog = {
     dode: new THREE.DodecahedronBufferGeometry(10, 0),
     icosa: new THREE.IcosahedronGeometry(10, 0),
     teapot: createTeapot(),
+    tube: new THREE.TubeGeometry(path, 20, 2, 8, false),
+    para: new THREE.ParametricGeometry(ParametricGeometries.klein, 25, 25)
 }
 
 let material = {
@@ -141,6 +168,8 @@ function createTeapot() {
 
     return geometry;
 }
+
+
 
 function onRender() {
     plane = getPlane(300, new THREE.MeshBasicMaterial({
@@ -271,6 +300,8 @@ let octa = document.querySelector('.octa');
 let knot = document.querySelector('.knot');
 let dode = document.querySelector('.dode');
 let icosa = document.querySelector('.icosa');
+let tube = document.querySelector('.tube');
+let para = document.querySelector('.para');
 let drawWithPoint = document.querySelector('.point');
 let drawWithLine = document.querySelector('.line');
 let drawWithTexture = document.querySelector('.texture');
@@ -314,6 +345,12 @@ function addFunc() {
     }
     icosa.onclick = function() {
         addGeo('icosa');
+    }
+    tube.onclick = function() {
+        addGeo('tube');
+    }
+    para.onclick = function() {
+        addGeo('para');
     }
     // Surface
     drawWithPoint.onclick = function () {
