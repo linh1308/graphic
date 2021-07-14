@@ -1,18 +1,11 @@
 import * as THREE from 'three';
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
+import { Camera, Clock, DirectionalLight, MeshBasicMaterial, Plane } from 'three';
 
-let mesh, point, camera, light;
+let mesh, point, camera, light, ani1, ani2, plane, ambientLight, controls;
 
 const scene = new THREE.Scene();
-const renderer = new THREE.WebGLRenderer();
-
-let plane = getPlane(300);
-plane.name = 'plane-1';
-plane.rotation.x = Math.PI / 2;
-plane.position.y = -20;
-scene.add(plane);
-onRender();
-
+let renderer = new THREE.WebGLRenderer({ antialias: true });
 
 const catalog = {
     box: new THREE.BoxGeometry(10, 10, 10),
@@ -23,7 +16,8 @@ const catalog = {
 }
 
 let material = {
-    default: new THREE.MeshLambertMaterial({ color: 0xdddddd }),
+    default: new THREE.MeshBasicMaterial({ color: 0xdddddd }),
+    standard: new THREE.MeshStandardMaterial({ color: 0xdddddd }),
     point: new THREE.PointsMaterial({ size: 0.05, color: 0xdddddd }),
 }
 
@@ -38,18 +32,12 @@ function addGeo(item, materialOpt = 'default') {
     }
 
     let geometry = catalog[item];
-    let selectMaterial = material[materialOpt];
+    let selectMaterial = material['default'];
 
     mesh = new THREE.Mesh(geometry, selectMaterial);
+    mesh.castShadow = true;
     scene.add(mesh);
-    console.log(scene)
-    onRender();
-}
-
-function changeMaterial(item) {
-    // console.log(geometry)
-    scene.children[1].material = material[item];
-    onRender();
+    update(renderer, scene, camera, controls);
 }
 
 function drawPoint() {
@@ -65,8 +53,9 @@ function drawPoint() {
     let selectMaterial = material['point'];
 
     point = new THREE.Points(geometry, selectMaterial);
+    point.castShadow = true;
     scene.add(point);
-    onRender();
+    update(renderer, scene, camera, controls);
 }
 
 function drawLine() {
@@ -81,56 +70,44 @@ function drawLine() {
         mesh.geometry.dispose();
     }
     point = new THREE.Line(geometry, selectMaterial);
+    point.castShadow = true;
     scene.add(point);
-    onRender();
+    update(renderer, scene, camera, controls);
 }
 
-// function texture() {
-//     let imgTextture = new THREE.TextureLoader();
-//     let mapTexture = imgTextture.load('./background.jpg');
-//     mapTexture.format = THREE.RGBFormat;
-//     console.log(mapTexture)
-//     let geometry = catalog['box'];
-//     let selectMaterial = new THREE.MeshBasicMaterial({ map: mapTexture });
-
-//     mesh = new THREE.Mesh(geometry, selectMaterial);
-//     scene.add(mesh);
-//     console.log(mesh)
-//     onRender();
-// }
-
-// var fileTag = document.getElementById("filetag");
-// // preview = document.getElementById("preview");
-
-// fileTag.addEventListener("change", function () {
-//     changeImage(this);
-// });
-
-// function changeImage(input) {
-//     var reader;
-
-//     if (input.files && input.files[0]) {
-//         reader = new FileReader();
-
-//         reader.onload = function (e) {
-//             // preview.setAttribute('src', e.target.result);
-//             // console.log(e.target.result)
-//             scene.children[1].material.map - new THREE.TextureLoader(e.target.result);
-//             scene.children[1].material.needsUpdate = true;
-
-//         }
-
-
-//         reader.readAsDataURL(input.files[0]);
-//     }
-// }
+function texture() {
+    lightShow();
+    let loader = new THREE.TextureLoader();
+    mesh.material = new THREE.MeshStandardMaterial({ color: 0xdddddd })
+    let selectMaterial = mesh.material;
+    selectMaterial.map = loader.load('./img/2021.png');
+    
+    update(renderer, scene, camera, controls);
+}
 
 function lightShow() {
-    light = new THREE.PointLight(0xff0000, 1, 100);
-    light.position.set(1, 20, 20);
+    if (light) {
+        lightRemove();
+    }
+    mesh.material = new THREE.MeshStandardMaterial({ color: 0xdddddd });
+    plane.material = new THREE.MeshStandardMaterial({
+        color: 0x888888,
+        side: THREE.DoubleSide
+    });
+    light = new THREE.SpotLight(0x888888, 4.0);
+    light.position.x = 100;
+    light.position.y = 50;
+    light.position.z = -50;
+
+    light.castShadow = true;
+    light.shadow.bias = 0.001;
+    light.shadow.mapSize.width = 2048;
+    light.shadow.mapSize.height = 2048;
+
     light.name = 'light';
     scene.add(light);
-    onRender();
+
+    update(renderer, scene, camera, controls);
 }
 
 function lightRemove() {
@@ -139,11 +116,26 @@ function lightRemove() {
             scene.remove(e);
         }
     })
-    onRender();
+    mesh.material = new THREE.MeshBasicMaterial({ color: 0xdddddd });
+    plane.material = new THREE.MeshBasicMaterial({
+        color: 0x888888,
+        side: THREE.DoubleSide
+    })
+    // renderer.render(scene, camera);
+    // light = undefined;
+    update(renderer, scene, camera, controls);
 }
 
 function onRender() {
-    renderer.setSize(window.innerWidth, window.innerHeight);
+    plane = getPlane(300, new THREE.MeshBasicMaterial({
+        color: 0x888888,
+        side: THREE.DoubleSide
+    }));
+    plane.rotation.x = Math.PI / 2;
+    plane.position.y = -15;
+    plane.receiveShadow = true;
+    scene.add(plane);
+
     camera = new THREE.PerspectiveCamera(
         75,
         window.innerWidth / window.innerHeight,
@@ -156,21 +148,38 @@ function onRender() {
     camera.position.z = 20;
 
     camera.lookAt(new THREE.Vector3(0, 0, 0));
-    // renderer.setClearColor(0xffffff)
-    renderer.render(scene, camera);
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    renderer.shadowMap.enabled = true;
     document.getElementById('app').appendChild(renderer.domElement);
+
+    controls = new OrbitControls(camera, renderer.domElement);
+    update(renderer, scene, camera, controls);
 }
 
-function getPlane(size) {
-    let geometry = new THREE.PlaneGeometry(size, size);
-    let material = new THREE.MeshBasicMaterial({
-        color: 0x888888,
-        side: THREE.DoubleSide
+onRender()
+
+function update(renderer, scene, camera, controls) {
+    renderer.render(
+        scene,
+        camera
+    );
+
+    controls.update()
+
+    requestAnimationFrame(function () {
+        update(renderer, scene, camera, controls);
     });
+}
+
+
+function getPlane(size, material) {
+    let geometry = new THREE.PlaneGeometry(size, size);
     let mesh = new THREE.Mesh(
         geometry,
         material
     );
+
+    mesh.receiveShadow = true;
 
     return mesh;
 }
@@ -219,8 +228,16 @@ function animation_2() {
         }
     }
 
-    onRender();
-    requestAnimationFrame(animation_2);
+    update(renderer, scene, camera, controls);
+    ani1 = requestAnimationFrame(animation_2);
+}
+
+function stopAnimation() {
+    if (ani1) {
+        cancelAnimationFrame(ani1);
+    } else {
+        createjs.Ticker.addEventListener("tick", animation_1);
+    }
 }
 
 // function scaleGeo() {
@@ -239,6 +256,7 @@ let playAnimation_1 = document.querySelector('.animation-1');
 let playAnimation_2 = document.querySelector('.animation-2');
 let pointLight = document.querySelector('.point-light')
 let lightDel = document.querySelector('.light-del')
+let removeAnimation = document.querySelector('.remove-animation')
 
 function addFunc() {
     // Geometry
@@ -275,6 +293,9 @@ function addFunc() {
     }
     playAnimation_2.onclick = function () {
         animation_2();
+    }
+    removeAnimation.onclick = function () {
+        stopAnimation();
     }
 
     // Light
