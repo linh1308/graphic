@@ -1,11 +1,31 @@
 import * as THREE from 'three';
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
-import { Camera, Clock, DirectionalLight, MeshBasicMaterial, Plane } from 'three';
+import { TeapotGeometry } from "./node_modules/three/examples/jsm/geometries/TeapotGeometry";
+import { ParametricGeometries } from "./node_modules/three/examples/jsm/geometries/ParametricGeometries";
+import * as dat from 'dat.gui';
 
-let mesh, point, camera, light, ani1, ani2, plane, ambientLight, controls;
+let mesh, point, camera, light, ani1, plane, controls, selectMaterial;
 
 const scene = new THREE.Scene();
 let renderer = new THREE.WebGLRenderer({ antialias: true });
+let gui = new dat.GUI();
+gui.domElement.id = 'gui';
+
+// define tube geometry
+class CustomSinCurve extends THREE.Curve {
+    constructor(scale = 1) {
+        super();
+        this.scale = scale;
+    }
+
+    getPoint(t, optionalTarget = new THREE.Vector3()) {
+        const tx = t * 3 - 1.5;
+        const ty = Math.sin(2 * Math.PI * t);
+        const tz = 0;
+        return optionalTarget.set(tx, ty, tz).multiplyScalar(this.scale);
+    }
+}
+const path = new CustomSinCurve(10);
 
 const catalog = {
     box: new THREE.BoxGeometry(10, 10, 10),
@@ -13,6 +33,14 @@ const catalog = {
     cone: new THREE.ConeGeometry(5, 20, 32),
     cylinder: new THREE.CylinderGeometry(5, 5, 20, 32),
     torus: new THREE.TorusGeometry(10, 3, 16, 100),
+    tetrahedron: new THREE.TetrahedronGeometry(8, 3),
+    octahedron: new THREE.OctahedronGeometry(10, 1),
+    knot: new THREE.TorusKnotGeometry(10, 2, 50, 8),
+    dodecahedron: new THREE.DodecahedronBufferGeometry(10, 0),
+    icosahedron: new THREE.IcosahedronGeometry(10, 0),
+    teapot: createTeapot(),
+    tube: new THREE.TubeGeometry(path, 20, 2, 8, false),
+    parametric: new THREE.ParametricGeometry(ParametricGeometries.klein, 25, 25)
 }
 
 let material = {
@@ -30,14 +58,26 @@ function addGeo(item, materialOpt = 'default') {
         scene.remove(point);
         point.geometry.dispose();
     }
-
+    if (light !== undefined) {
+        selectMaterial = material['standard'];
+    } else {
+        selectMaterial = material['default'];
+    }
     let geometry = catalog[item];
-    let selectMaterial = material['default'];
-
     mesh = new THREE.Mesh(geometry, selectMaterial);
     mesh.castShadow = true;
+    mesh.name = 'objectGeo';
     scene.add(mesh);
     update(renderer, scene, camera, controls);
+}
+
+function createTeapot() {
+    let geometry = new TeapotGeometry(
+        10, 10,
+        true, true, true, false, false
+    );
+
+    return geometry;
 }
 
 function drawPoint() {
@@ -122,8 +162,8 @@ function lightRemove() {
         side: THREE.DoubleSide
     })
     // renderer.render(scene, camera);
-    // light = undefined;
     update(renderer, scene, camera, controls);
+    light = undefined;
 }
 
 function onRender() {
@@ -164,7 +204,7 @@ function update(renderer, scene, camera, controls) {
         camera
     );
 
-    controls.update()
+    controls.update();
 
     requestAnimationFrame(function () {
         update(renderer, scene, camera, controls);
@@ -240,15 +280,131 @@ function stopAnimation() {
     }
 }
 
-// function scaleGeo() {
-//     mesh.scale.y = 2.0;
-// }
+class MinMaxGUIHelper {
+    constructor(obj, minProp, maxProp, minDif) {
+        this.obj = obj;
+        this.minProp = minProp;
+        this.maxProp = maxProp;
+        this.minDif = minDif;
+    }
+    get min() {
+        return this.obj[this.minProp];
+    }
+    set min(v) {
+        this.obj[this.minProp] = v;
+        this.obj[this.maxProp] = Math.max(this.obj[this.maxProp], v + this.minDif);
+    }
+    get max() {
+        return this.obj[this.maxProp];
+    }
+    set max(v) {
+        this.obj[this.maxProp] = v;
+        this.min = this.min;
+    }
+}
+
+let controlObject = {
+    posX: 0,
+    posY: 0,
+    posZ: 0,
+
+    rotX: 0,
+    rotY: 0,
+    rotZ: 0,
+
+    scaX: 0,
+    scaY: 0,
+    scaZ: 0,
+}
+
+function setColor() {
+    let params = {
+        color: 0xff00ff,
+        lightColor: 0xdddddd
+    };
+    gui.addColor(params, 'color')
+        .onChange(function () {
+            mesh.material.color.set(params.color);
+        });
+}
+
+function setLight() {
+    let params = {
+        light: 0xdddddd,
+    };
+    gui.addColor(params, 'light')
+        .onChange(function () {
+            light.color.setHex(params.light);
+        });
+}
+
+function setControlObj() {
+    let affineTransform = gui.addFolder('Affine transform');
+    affineTransform.add(controlObject, 'posX', -20, 20).name('position x').onChange(function () {
+        mesh.position.set(0, 0, 0)
+        mesh.position.x += controlObject.posX;
+
+    });
+    affineTransform.add(controlObject, 'posY', -20, 20).name('position y').onChange(function () {
+        mesh.position.set(0, 0, 0)
+        mesh.position.y += controlObject.posY;
+    });
+    affineTransform.add(controlObject, 'posZ', -20, 20).name('position z').onChange(function () {
+        mesh.position.set(0, 0, 0)
+        mesh.position.z += controlObject.posZ;
+    });
+    affineTransform.add(controlObject, 'rotX', 0, 20).name('rotate x').onChange(function () {
+        mesh.position.set(0, 0, 0)
+        mesh.rotation.x += controlObject.rotX;
+    });
+    affineTransform.add(controlObject, 'rotY', 0, 20).name('rotate y').onChange(function () {
+        mesh.rotation.y += controlObject.rotY;
+    });
+    affineTransform.add(controlObject, 'rotZ', 0, 20).name('rotate z').onChange(function () {
+        mesh.rotation.z += controlObject.rotZ;
+    });
+    affineTransform.add(controlObject, 'scaX', 0, 20).name('scale x').onChange(function () {
+        mesh.scale.x = controlObject.scaX;
+    });
+    affineTransform.add(controlObject, 'scaY', 0, 20).name('scale y').onChange(function () {
+        mesh.scale.y = controlObject.scaY;
+    });
+    affineTransform.add(controlObject, 'scaZ', 0, 20).name('scale z').onChange(function () {
+        mesh.scale.z = controlObject.scaY;
+    });
+
+}
+
+setColor();
+setLight();
+
+function updateCamera() {
+    camera.updateProjectionMatrix();
+}
+
+function addGui() {
+    gui.add(camera, 'fov', 1, 150).onChange(updateCamera);
+    const minMaxGUIHelper = new MinMaxGUIHelper(camera, 'near', 'far', 0.1);
+    gui.add(minMaxGUIHelper, 'min', 0.1, 50, 0.1).name('near').onChange(updateCamera);
+    gui.add(minMaxGUIHelper, 'max', 0.1, 5000, 0.1).name('far').onChange(updateCamera);
+}
+
+addGui();
+setControlObj();
 
 let box = document.querySelector('.box');
 let sphere = document.querySelector('.sphere');
 let cone = document.querySelector('.cone');
 let cylinder = document.querySelector('.cylinder');
 let torus = document.querySelector('.torus');
+let tetra = document.querySelector('.tetrahedron');
+let octa = document.querySelector('.octahedron');
+let knot = document.querySelector('.knot');
+let dode = document.querySelector('.dodecahedron');
+let icosa = document.querySelector('.icosahedron');
+let teapot = document.querySelector('.teapot');
+let tube = document.querySelector('.tube');
+let para = document.querySelector('.parametric');
 let drawWithPoint = document.querySelector('.point');
 let drawWithLine = document.querySelector('.line');
 let drawWithTexture = document.querySelector('.texture');
@@ -275,6 +431,30 @@ function addFunc() {
     torus.onclick = function () {
         addGeo('torus');
     };
+    tetra.onclick = function () {
+        addGeo('tetrahedron');
+    }
+    octa.onclick = function () {
+        addGeo('octahedron');
+    }
+    knot.onclick = function () {
+        addGeo('knot');
+    }
+    dode.onclick = function () {
+        addGeo('dodecahedron');
+    }
+    icosa.onclick = function () {
+        addGeo('icosahedron');
+    }
+    teapot.onclick = function () {
+        addGeo('teapot');
+    }
+    tube.onclick = function () {
+        addGeo('tube');
+    }
+    para.onclick = function () {
+        addGeo('parametric');
+    }
 
     // Surface
     drawWithPoint.onclick = function () {
