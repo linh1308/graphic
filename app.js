@@ -63,10 +63,15 @@ function addGeo(item, materialOpt = 'default') {
     } else {
         selectMaterial = material['default'];
     }
+    if (point !== undefined) {
+        scene.remove(point);
+        point.geometry.dispose();
+    }
     let geometry = catalog[item];
     mesh = new THREE.Mesh(geometry, selectMaterial);
     mesh.castShadow = true;
     scene.add(mesh);
+    console.log(scene)
     update(renderer, scene, camera, controls);
 }
 
@@ -119,6 +124,7 @@ function drawLine() {
     point = new THREE.Line(geometry, selectMaterial);
     point.castShadow = true;
     scene.add(point);
+    console.log(scene)
     update(renderer, scene, camera, controls);
 }
 
