@@ -1,7 +1,7 @@
 import * as THREE from 'three';
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
 import { TeapotGeometry } from "./node_modules/three/examples/jsm/geometries/TeapotGeometry";
-import { ParametricGeometries } from "./node_modules/three/examples/jsm/geometries/ParametricGeometries";
+// import { ParametricGeometries } from "./node_modules/three/examples/jsm/geometries/ParametricGeometries";
 import * as dat from 'dat.gui';
 
 let mesh, point, camera, light, ani1, plane, controls, selectMaterial, solid;
@@ -12,20 +12,20 @@ let gui = new dat.GUI();
 gui.domElement.id = 'gui';
 
 // define tube geometry
-class CustomSinCurve extends THREE.Curve {
-    constructor(scale = 1) {
-        super();
-        this.scale = scale;
-    }
+// class CustomSinCurve extends THREE.Curve {
+//     constructor(scale = 1) {
+//         super();
+//         this.scale = scale;
+//     }
 
-    getPoint(t, optionalTarget = new THREE.Vector3()) {
-        const tx = t * 3 - 1.5;
-        const ty = Math.sin(2 * Math.PI * t);
-        const tz = 0;
-        return optionalTarget.set(tx, ty, tz).multiplyScalar(this.scale);
-    }
-}
-const path = new CustomSinCurve(10);
+//     getPoint(t, optionalTarget = new THREE.Vector3()) {
+//         const tx = t * 3 - 1.5;
+//         const ty = Math.sin(2 * Math.PI * t);
+//         const tz = 0;
+//         return optionalTarget.set(tx, ty, tz).multiplyScalar(this.scale);
+//     }
+// }
+// const path = new CustomSinCurve(10);
 
 const catalog = {
     box: new THREE.BoxGeometry(10, 10, 10),
@@ -39,8 +39,8 @@ const catalog = {
     dodecahedron: new THREE.DodecahedronBufferGeometry(10, 0),
     icosahedron: new THREE.IcosahedronGeometry(10, 0),
     teapot: createTeapot(),
-    tube: new THREE.TubeGeometry(path, 20, 2, 8, false),
-    parametric: new THREE.ParametricGeometry(ParametricGeometries.klein, 25, 25)
+    // tube: new THREE.TubeGeometry(path, 20, 2, 8, false),
+    // parametric: new THREE.ParametricGeometry(ParametricGeometries.klein, 25, 25)
 }
 
 let material = {
@@ -482,8 +482,8 @@ let knot = document.querySelector('.knot');
 let dode = document.querySelector('.dodecahedron');
 let icosa = document.querySelector('.icosahedron');
 let teapot = document.querySelector('.teapot');
-let tube = document.querySelector('.tube');
-let para = document.querySelector('.parametric');
+// let tube = document.querySelector('.tube');
+// let para = document.querySelector('.parametric');
 let drawWithPoint = document.querySelector('.point');
 let drawWithLine = document.querySelector('.line');
 let drawWithSolid = document.querySelector('.solid');
@@ -529,12 +529,12 @@ function addFunc() {
     teapot.onclick = function () {
         addGeo('teapot');
     }
-    tube.onclick = function () {
-        addGeo('tube');
-    }
-    para.onclick = function () {
-        addGeo('parametric');
-    }
+    // tube.onclick = function () {
+    //     addGeo('tube');
+    // }
+    // para.onclick = function () {
+    //     addGeo('parametric');
+    // }
 
     // Surface
     drawWithPoint.onclick = function () {
